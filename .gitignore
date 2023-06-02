@@ -25,3 +25,4 @@ build/
 Debug/
 x64/
 tasktracker.dir/
+tasks.json
