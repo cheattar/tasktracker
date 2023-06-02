@@ -30,27 +30,28 @@ namespace tasks {
 
 }
 
-void newTask(std::vector<tasks::task> tasks) {
+void newTask(std::vector<tasks::task>& taskVector) {
     std::cout << "Please enter your task name.\n? "; std::string utn; std::getline(std::cin, utn);
     std::cout << "Please enter your task contents.\n? "; std::string utc; std::getline(std::cin, utc);
     
-    if (tasks.size() == 0){
-        tasks.push_back(tasks::task{0, utn, utc});
+   if (taskVector.empty()){
+       tasks::task t = { 0, utn, utc };
+       taskVector.push_back(t);
     }
-    else {
-        int id = tasks.back().id + 1; 
-        tasks.push_back(tasks::task{id, utn, utc});
-    }
-    
+   else {
+       int id = taskVector.back().id + 1; 
+       tasks::task t = { id, utn, utc };
+       taskVector.push_back(t);
+   }
 }
 
+
+
 int main() {
-    std::vector<tasks::task> taks(0);
+    std::vector<tasks::task> taks;
     
     newTask(taks);
     newTask(taks);
-
-    //std::stringstream s;
 
     json j = taks;
 
@@ -59,6 +60,5 @@ int main() {
     std::ofstream file("tasks.json");
     file << j;
 
-    //std::cout << "Hello, world!" << std::endl;
     return 0;
 }

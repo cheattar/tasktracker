@@ -11,3 +11,17 @@ CTestTestfile.cmake
 _deps
 build/
 .cache/
+.vs/
+*.slo
+*.lo
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+Debug/
+x64/
+tasktracker.dir/
