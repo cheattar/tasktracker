@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(TaskTracker LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 11)
+cmake_policy(SET CMP0135 NEW)
 
 include(FetchContent)
 

@@ -76,10 +76,26 @@ void viewTasks(std::vector<tasks::task>& taskVector) {
         fmt::print("|{:^9}|{:^9}|{:^9}|\n", taskVector.at(i).id, taskVector.at(i).description, taskVector.at(i).urgency);
     }
 }
+void loadTasks(std::vector<tasks::task> taskList) {
+    std::ifstream json_file("tasks.json");
+    if (json_file) {
+        //std::cout << json_file.rdbuf();
+        json j = json::parse(json_file);
+        //std::cout << j.dump(4) << std::endl;
+        auto taskList = j.get<std::vector<tasks::task>>();
+        json_file.close();
+    }
+    else {
+        fmt::print("tasks.json file not found in current directory or it doesn't exist!\nCreating new one...\n");
+        std::vector<tasks::task> taskList;
+    }
+    
+}
 
 int main() {
+    fmt::print("Welcome to TaskTracker!\n");
     std::vector<tasks::task> taskList;
-    
+    loadTasks(taskList);
     while (true) {
         fmt::print("Select option: (A)dd task, (V)iew tasks, E(x)it.\n? ");
         std::string usrChoice; std::getline(std::cin, usrChoice);
@@ -98,16 +114,27 @@ int main() {
         }
     }
 
-    json j = taskList;
+    askToSave:
+    fmt::print("Do you want to save your tasks file? (Y/N)\n? ");
+    std::string usrExit; std::getline(std::cin, usrExit);
 
-    std::cout << j << '\n';
-
-    fmt::print("Saving tasks file...");
-
-    std::ofstream file("tasks.json");
-    file << j;
-
-    fmt::print("Good bye.");
+    if (usrExit == "Y" || usrExit == "y") {
+        json j = taskList;
+        //std::cout << j << '\n';
+        fmt::print("Saving tasks file...\n");
+        std::ofstream file("tasks.json");
+        file << j;
+    }
+    else if(usrExit == "N" || usrExit == "n") {
+        goto exit;
+    }
+    else {
+        fmt::print("Incorrect option. Please try again.\n");
+        goto askToSave;
+    }
+    
+    exit:
+    fmt::print("Goodbye.\n");
 
     return 0;
 }
