@@ -5,8 +5,6 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
-#define PROJECT_NAME "tasktracker"
-
 using json = nlohmann::json;
 
 // Copied from: https://stackoverflow.com/a/52895729
@@ -20,6 +18,12 @@ void clear() {
 #elif defined (__APPLE__)
     system("clear");
 #endif
+}
+
+// Copied from: https://stackoverflow.com/a/19841704
+bool fileExists(const char *fileName) {
+    std::ifstream infile(fileName);
+    return infile.good();
 }
 
 namespace tasks {
@@ -38,7 +42,6 @@ namespace tasks {
     */
 
     void to_json(json& j, const task& t) {
-        //j = json{{ "id", t.id}, {"name", t.name}, {"contents", t.contents}};
         j["id"] = t.id;
         j["description"] = t.description;
         j["urgency"] = t.urgency;
@@ -82,7 +85,8 @@ void addTask(std::vector<tasks::task>& taskVector) {
        tasks::task t = { id, utn, utu};
        taskVector.push_back(t);
    }
-   // Clearing cin here fixes an bug with the if statements down below...
+   // Clearing cin here, and in other fixes an bug with the if statements down below...
+   // But sometimes causes it...
    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
@@ -107,24 +111,73 @@ void deleteTask(std::vector<tasks::task>& taskVector) {
     }
 }
 
-void loadTasks(std::vector<tasks::task>& taskList) {
-    std::ifstream json_file("tasks.json");
+void loadTasks(std::string path, std::vector<tasks::task>& taskList) {
+    std::ifstream json_file(path);
     if (json_file) {
         json j = json::parse(json_file);
         taskList = j.get<std::vector<tasks::task>>();
         json_file.close();
     }
     else {
-        fmt::print("tasks.json file not found in current directory or it doesn't exist!\nCreating new one...\n");
+        if (path == "tasks.json") {
+            fmt::print("tasks.json file not found in current directory!\nCreating file...\n");
+        }
         std::vector<tasks::task> taskList;
     }
 }
 
-int main() {
-    fmt::print("Welcome to TaskTracker!\n");
-    
+/*void loadTasks(std::vector<tasks::task>& taskList) {
+    loadTasks("tasks.json", taskList);
+}*/
+
+std::string filePath;
+
+int main(int argc, char *argv[]) {
     std::vector<tasks::task> taskList;
-    loadTasks(taskList);
+
+    if (argc == 1) {
+        filePath = "tasks.json";
+        loadTasks(filePath, taskList);
+    }
+    
+    // If the user gave an argument...
+    if (argc == 2) {
+        // Check if they want help
+        if (std::strcmp(argv[1], "-h") == 0 || std::strcmp(argv[1], "--help") == 0 ) {
+            fmt::print("TaskTracker  - an over engineered to do list.\n"
+                            "Usage: tasktracker [ARGUMENTS]\n"
+                            "-h, --help: displays this message\n"
+                            "[path to an file]: opens an file if it exists, if not ask if we want to create it.\n");
+            return 0;
+        }
+       
+        // Check if the program argument is a valid file path
+       if (fileExists(argv[1])) {
+        filePath = argv[1];
+        loadTasks(filePath, taskList);
+       }
+       else {
+        fmt::print("The file you're trying to open doesn't exist or isn't accessible.\n"
+                        "Do you want to create it? [Y/N] ");
+                        //
+        std::string ucf; std::cin >> ucf;
+        if (ucf == "Y" || ucf == "y") {
+            fmt::print("Creating file...\n");
+            filePath = argv[1];
+            loadTasks(filePath, taskList);
+        }
+        else if (ucf == "N" || ucf == "n") {
+            fmt::print("Check if you have permissions to open the file or if you have mistyped the filename.\n");
+            return 1;
+        }
+        else {
+            fmt::print("Incorrect option. Please try again.\n");
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+       }
+    }
+    
+    fmt::print("Welcome to TaskTracker!\n");
     
     while (true) {
         fmt::print("Select option: (A)dd task, (D)elete task, (V)iew tasks, E(x)it.\n? ");
@@ -135,7 +188,7 @@ int main() {
             addTask(taskList); 
             rearrangeIDs(taskList); // We rearrange ID's so they look pretty on print, 
                                                 // and it's better when delete a task, 
-                                                // because human start counting at 1,
+                                                // because humans start counting at 1,
                                                 // arrays/vectors at 0 (unless you're programming in Lua or MATLAB...)
         }
         else if (usrChoice == "D" || usrChoice == "d") {
@@ -162,7 +215,7 @@ int main() {
     if (usrExit == "Y" || usrExit == "y") {
         json j = taskList;
         fmt::print("Saving tasks file...\n");
-        std::ofstream file("tasks.json");
+        std::ofstream file(filePath);
         file << j;
         file.close();
     }
