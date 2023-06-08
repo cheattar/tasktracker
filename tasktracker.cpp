@@ -43,7 +43,7 @@ namespace tasks {
         j["description"] = t.description;
         j["urgency"] = t.urgency;
     }
-    void from_json(const json& j, task t) {
+    void from_json(const json& j, task& t) {
         j.at("id").get_to(t.id);
         j.at("description").get_to(t.description);
         j.at("urgency").get_to(t.urgency);
@@ -76,13 +76,14 @@ void viewTasks(std::vector<tasks::task>& taskVector) {
         fmt::print("|{:^9}|{:^9}|{:^9}|\n", taskVector.at(i).id, taskVector.at(i).description, taskVector.at(i).urgency);
     }
 }
-void loadTasks(std::vector<tasks::task> taskList) {
+
+void loadTasks(std::vector<tasks::task>& taskList) {
     std::ifstream json_file("tasks.json");
     if (json_file) {
         //std::cout << json_file.rdbuf();
         json j = json::parse(json_file);
         //std::cout << j.dump(4) << std::endl;
-        auto taskList = j.get<std::vector<tasks::task>>();
+        taskList = j.get<std::vector<tasks::task>>();
         json_file.close();
     }
     else {
@@ -97,6 +98,7 @@ int main() {
     std::vector<tasks::task> taskList;
     loadTasks(taskList);
     while (true) {
+        start:
         fmt::print("Select option: (A)dd task, (V)iew tasks, E(x)it.\n? ");
         std::string usrChoice; std::getline(std::cin, usrChoice);
         
