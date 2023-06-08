@@ -85,8 +85,8 @@ void addTask(std::vector<tasks::task>& taskVector) {
        tasks::task t = { id, utn, utu};
        taskVector.push_back(t);
    }
-   // Clearing cin here, and in other fixes an bug with the if statements down below...
-   // But sometimes causes it...
+   // Clearing cin here and in other places fixes an bug with the if statements down below.
+   // But sometimes it causes it...
    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
@@ -187,9 +187,9 @@ int main(int argc, char *argv[]) {
             clear(); 
             addTask(taskList); 
             rearrangeIDs(taskList); // We rearrange ID's so they look pretty on print, 
-                                                // and it's better when delete a task, 
-                                                // because humans start counting at 1,
-                                                // arrays/vectors at 0 (unless you're programming in Lua or MATLAB...)
+                                    // and it's better when delete a task, 
+                                    // because humans start counting at 1,
+                                    // arrays/vectors at 0 (unless you're programming in Lua or MATLAB...)
         }
         else if (usrChoice == "D" || usrChoice == "d") {
             clear(); 
