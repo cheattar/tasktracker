@@ -74,39 +74,40 @@ void viewTasks(std::vector<tasks::task>& taskVector) {
 }
 
 void addTask(std::vector<tasks::task>& taskVector) {
-    fmt::print("Please enter your task.\n? "); std::string utn; std::getline(std::cin, utn);
+    fmt::print("Please enter your task.\n? "); std::string inputTaskName; std::getline(std::cin, inputTaskName);
     askForUrgency:
-    fmt::print("From a scale from 1 to 5, how urgent is your task?\n? "); int utu; std::cin >> utu;
-    if (utu < 0 || utu >= 6) {
+    fmt::print("From a scale from 1 to 5, how urgent is your task?\n? "); int inputTaskUrgency; std::cin >> inputTaskUrgency;
+    if (inputTaskUrgency <= 0 || inputTaskUrgency >= 6) {
         fmt::print("Your value was out of range, please try again.\n");
         goto askForUrgency;
     }
     if (taskVector.empty()){
-       tasks::task t = { 0, utn, utu};
+       tasks::task t = { 0, inputTaskName, inputTaskUrgency};
        taskVector.push_back(t);
     }
     else {
        int id = taskVector.back().id + 1; 
-       tasks::task t = { id, utn, utu};
+       tasks::task t = { id, inputTaskName, inputTaskUrgency};
        taskVector.push_back(t);
    }
    // Clearing cin here and in other places fixes an bug with the if statements down below.
-   // But sometimes it causes it...
+   // But sometimes it causes another bug...
    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 void deleteTask(std::vector<tasks::task>& taskVector) {
+    // View the tasks, so the user knows which task to delete. (Unless they know beforehand...)
     viewTasks(taskVector);
 
     fmt::print("Please input which task you want to remove.\n? "); std::string inpIDstr; std::getline(std::cin, inpIDstr);
     int inpID = std::stoi(inpIDstr);
 
     if (inpID >= 1 && inpID <= taskVector.size()) {
-        // Find the task to delete using an iterator
+        // Find the task to delete using an iterator.
         auto it = taskVector.begin() + (inpID - 1);
         taskVector.erase(it);
-
-        // Rearrange IDs so that they match up with vector size
+        
+        // Rearrange IDs so that they match up with vector size.
         rearrangeIDs(taskVector);
 
         fmt::print("Task deleted successfully.\n");
@@ -117,12 +118,14 @@ void deleteTask(std::vector<tasks::task>& taskVector) {
 }
 
 void loadTasks(std::string path, std::vector<tasks::task>& taskList) {
-    std::ifstream json_file(path);
-    if (json_file) {
-        json j = json::parse(json_file);
+    std::ifstream jsonFile(path);
+    // If the file opens, dump it into the vector.
+    if (jsonFile) {
+        json j = json::parse(jsonFile);
         taskList = j.get<std::vector<tasks::task>>();
-        json_file.close();
+        jsonFile.close();
     }
+    // If it doesn't create a new one.
     else {
         if (path == "tasks.json") {
             fmt::print("tasks.json file not found in current directory!\nCreating file...\n");
@@ -139,7 +142,9 @@ std::string filePath;
 
 int main(int argc, char *argv[]) {
     std::vector<tasks::task> taskList;
-
+    
+    // If the user didn't give any arguments, 
+    // then we try to open the file tasks.json in the current directory.
     if (argc == 1) {
         filePath = "tasks.json";
         loadTasks(filePath, taskList);
@@ -158,22 +163,24 @@ int main(int argc, char *argv[]) {
             return 0;
         }
        
-        // Check if the program argument is a valid file path
+       // Check if the program argument is a valid file path
        if (fileExists(argv[1])) {
         filePath = argv[1];
         loadTasks(filePath, taskList);
        }
+       // If the file given by the user doesn't open (e. g. it doesn't exist),
+       // we ask the user if they want to create a new file,
+       // if not we exit the program.
        else {
         fmt::print("The file you're trying to open doesn't exist or isn't accessible.\n"
                         "Do you want to create it? [Y/N] ");
-                        //
-        std::string ucf; std::cin >> ucf;
-        if (ucf == "Y" || ucf == "y") {
+        std::string createFileSelection; std::cin >> createFileSelection;
+        if (createFileSelection == "Y" || createFileSelection == "y") {
             fmt::print("Creating file...\n");
             filePath = argv[1];
             loadTasks(filePath, taskList);
         }
-        else if (ucf == "N" || ucf == "n") {
+        else if (createFileSelection == "N" || createFileSelection == "n") {
             fmt::print("Check if you have permissions to open the file or if you have mistyped the filename.\n");
             return 1;
         }
@@ -194,9 +201,9 @@ int main(int argc, char *argv[]) {
             clear(); 
             addTask(taskList); 
             rearrangeIDs(taskList); // We rearrange ID's so they look pretty on print, 
-                                    // and it's better when delete a task, 
+                                    // and it's better when deleting a task,
                                     // because humans start counting at 1,
-                                    // arrays/vectors at 0 (unless you're programming in Lua or MATLAB...)
+                                    // and arrays/vectors, etc... start at 0. (Unless you're programming in Lua or MATLAB...)
         }
         else if (usrChoice == "D" || usrChoice == "d") {
             clear(); 
