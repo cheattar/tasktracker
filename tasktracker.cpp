@@ -144,10 +144,12 @@ int main(int argc, char *argv[]) {
     if (argc == 2) {
         // Check if they want help
         if (std::strcmp(argv[1], "-h") == 0 || std::strcmp(argv[1], "--help") == 0 ) {
-            fmt::print("TaskTracker  - an over engineered to do list.\n"
-                            "Usage: tasktracker [ARGUMENTS]\n"
-                            "-h, --help: displays this message\n"
-                            "[path to an file]: opens an file if it exists, if not ask if we want to create it.\n");
+            fmt::print("TaskTracker - an over engineered to do list.\n"
+                            "\nUsage: \n"
+							"	tasktracker [ARGUMENTS]\n"
+							"\nArguments: \n"
+                            "	-h, --help: displays this message,\n"
+                            "	[path to an file]: opens an file if it exists, if not ask if we want to create it.\n");
             return 0;
         }
        
