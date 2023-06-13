@@ -75,7 +75,12 @@ void viewTasks(std::vector<tasks::task>& taskVector) {
 
 void addTask(std::vector<tasks::task>& taskVector) {
     fmt::print("Please enter your task.\n? "); std::string utn; std::getline(std::cin, utn);
+    askForUrgency:
     fmt::print("From a scale from 1 to 5, how urgent is your task?\n? "); int utu; std::cin >> utu;
+    if (utu < 0 || utu >= 6) {
+        fmt::print("Your value was out of range, please try again.\n");
+        goto askForUrgency;
+    }
     if (taskVector.empty()){
        tasks::task t = { 0, utn, utu};
        taskVector.push_back(t);
