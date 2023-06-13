@@ -134,10 +134,6 @@ void loadTasks(std::string path, std::vector<tasks::task>& taskList) {
     }
 }
 
-/*void loadTasks(std::vector<tasks::task>& taskList) {
-    loadTasks("tasks.json", taskList);
-}*/
-
 std::string filePath;
 
 int main(int argc, char *argv[]) {
@@ -156,8 +152,8 @@ int main(int argc, char *argv[]) {
         if (std::strcmp(argv[1], "-h") == 0 || std::strcmp(argv[1], "--help") == 0 ) {
             fmt::print("TaskTracker - an over engineered to do list.\n"
                             "\nUsage: \n"
-							"	tasktracker [ARGUMENTS]\n"
-							"\nArguments: \n"
+			    									"	tasktracker [ARGUMENTS]\n"
+			    									"\nArguments: \n"
                             "	-h, --help: displays this message,\n"
                             "	[path to an file]: opens an file if it exists, if not ask if we want to create it.\n");
             return 0;
